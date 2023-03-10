@@ -14,7 +14,6 @@
   
 <script setup>
   import { defineComponent } from "vue";
-  import SignIn from "./views/SignIn.vue";
   import { darkTheme } from "naive-ui";
 </script>
 

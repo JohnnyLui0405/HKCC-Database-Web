@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mariadb = require("mariadb");
 const query = require("../DB/index");
+const jwt = require("jsonwebtoken");
 
 var userApi = express.Router();
 userApi.use(bodyParser.json());
@@ -17,7 +17,10 @@ userApi.post("/login", async (req, res) => {
   const result = await query(sqlQuery);
   console.log(result);
   if (result.length !== 0) {
-    res.json({ success: true });
+    const token = jwt.sign({ _id: accessCode }, process.env.TOKEN_SECRET, {
+      expiresIn: "1 day",
+    });
+    res.send({ success: true, token });
   } else {
     res.json({ success: false });
   }

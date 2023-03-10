@@ -44,8 +44,10 @@
 
 <script setup>
 import { defineComponent, ref } from "vue";
-import { useMessage } from "naive-ui";
+import { useMessage, useLoadingBar } from "naive-ui";
+import { useRouter } from "vue-router";
 import axios from "axios";
+const router = useRouter();
 const formRef = ref(null);
 const message = useMessage();
 const size = ref("medium");
@@ -70,23 +72,29 @@ const rules = ref({
         },
       })
 
-const phone = ref("");
 
+      
+const loadingBar = useLoadingBar();
 const handleValidateClick = (e) => {
   e.preventDefault();
   formRef.value?.validate(async(errors) => {
     if (!errors) {
+      loadingBar.start();
       const res = await axios({
         method: "post",
-        url: "/api/user/login",
+        url: "http://localhost:3310/api/user/login",
         data: {
           accessCode: formValue.value.user.accessCode
         }
       })
       if (res.data.success) {
         message.success("Login Success");
+        localStorage.setItem("token", res.data.token);
+        router.push('/profile')
+        loadingBar.finish();
       } else {
         message.error("Login Failed");
+        loadingBar.error();
       }
     } else {
       console.log(errors);

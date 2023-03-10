@@ -1,5 +1,5 @@
 <template>
-    <n-form
+    <!-- <n-form
       ref="formRef"
       :label-width="80"
       :model="formValue"
@@ -17,8 +17,8 @@
           Login
         </n-button>
       </n-form-item>
-    </n-form>
-  
+    </n-form> -->
+    <n-p>Login Success</n-p>
     <!-- <pre>{{ JSON.stringify(formValue, null, 2) }}
   </pre> -->
   </template>
