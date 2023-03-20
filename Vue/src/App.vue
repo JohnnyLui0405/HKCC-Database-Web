@@ -14,7 +14,7 @@
   
 <script setup>
   import { defineComponent } from "vue";
-  import { darkTheme } from "naive-ui";
+  import { darkTheme, NConfigProvider, NLoadingBarProvider, NMessageProvider, NNotificationProvider, NDialogProvider } from "naive-ui";
 </script>
 
 <style>

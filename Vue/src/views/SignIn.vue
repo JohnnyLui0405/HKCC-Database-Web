@@ -44,9 +44,10 @@
 
 <script setup>
 import { defineComponent, ref } from "vue";
-import { useMessage, useLoadingBar } from "naive-ui";
+import { useMessage, useLoadingBar, NTabs, NCard, NTabPane, NButton, NForm, NFormItemRow, NInput } from "naive-ui";
 import { useRouter } from "vue-router";
 import axios from "axios";
+axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 const router = useRouter();
 const formRef = ref(null);
 const message = useMessage();
@@ -82,7 +83,7 @@ const handleValidateClick = (e) => {
       loadingBar.start();
       const res = await axios({
         method: "post",
-        url: "http://localhost:3310/api/user/login",
+        url: "/api/user/login",
         data: {
           accessCode: formValue.value.user.accessCode
         }

@@ -8,5 +8,5 @@ app.use(cors());
 app.use("/api/user", require("./router/userRouter"));
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`Example app listening at http://localhost:${port}`);
 });
