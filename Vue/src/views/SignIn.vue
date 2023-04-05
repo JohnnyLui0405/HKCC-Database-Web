@@ -38,8 +38,8 @@
     </n-tabs>
   </n-card>
   </div>
-  <pre>{{ JSON.stringify(formValue, null, 2) }}
-</pre>
+  <!-- <pre>{{ JSON.stringify(formValue, null, 2) }}
+</pre> -->
 </template>
 
 <script setup>

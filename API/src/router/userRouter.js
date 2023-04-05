@@ -11,9 +11,8 @@ userApi.post("/login", async (req, res) => {
         res.send("login invalid");
         return;
     }
-    console.log(req.body?.accessCode === "00023837519807228797");
     let accessCode = req.body?.accessCode;
-    let sqlQuery = `SELECT * FROM felica_card WHERE luid = '${accessCode}'`;
+    let sqlQuery = `SELECT * FROM ext_felica_card WHERE luid = '${accessCode}'`;
     const result = await query(sqlQuery);
     console.log(result);
     if (result.length !== 0) {

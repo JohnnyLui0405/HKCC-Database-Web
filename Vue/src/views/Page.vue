@@ -42,7 +42,7 @@ const menuOptions = [
   {
     label: h(
       RouterLink,
-      { to: "./test" },
+      { to: "/profile/test" },
       { default: () => "Test" }
     ),
     key: "home"
