@@ -12,14 +12,14 @@
       <n-tab-pane name="signin" tab="Login">
         <n-form ref="formRef" :model="formValue" :rules="rules">
           <n-form-item-row path="user.accessCode" label="Access Code">
-            <n-input :disabled="!formValue.user.userName == '' || !formValue.user.password == ''" v-model:value="formValue.user.accessCode" placeholder="Enter your Access Code or User Name and Password"/>
+            <n-input :disabled="!formValue.user.userName == '' || !formValue.user.password == ''" v-model:value="formValue.user.accessCode" placeholder="Enter your Access Code"/>
           </n-form-item-row>
           <!-- create a horizontal line with OR in middle -->
           <n-form-item-row path="user.userName" label="User Name">
-            <n-input :disabled="!formValue.user.accessCode == ''" v-model:value="formValue.user.userName" placeholder="Enter your Access Code or User Name and Password"/>
+            <n-input :disabled="!formValue.user.accessCode == ''" v-model:value="formValue.user.userName" placeholder="Enter your User Name and Password"/>
           </n-form-item-row>
           <n-form-item-row path="user.password" label="Password">
-            <n-input type="password" :disabled="!formValue.user.accessCode  == ''" v-model:value="formValue.user.password" placeholder="Enter your Access Code or User Name and Password"/>
+            <n-input type="password" :disabled="!formValue.user.accessCode  == ''" v-model:value="formValue.user.password" placeholder="Enter your User Name and Password"/>
           </n-form-item-row>
         </n-form>
         <n-button @click=handleValidateClick type="primary" block secondary strong>
@@ -54,8 +54,8 @@ import { defineComponent, ref } from "vue";
 import { useMessage, useLoadingBar, NTabs, NCard, NTabPane, NButton, NForm, NFormItemRow, NInput } from "naive-ui";
 import { useRouter } from "vue-router";
 import axios from "axios";
-// axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
-axios.defaults.baseURL = 'http://localhost:3310';
+axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
+// axios.defaults.baseURL = 'http://localhost:3310';
 const router = useRouter();
 const formRef = ref(null);
 const registerRef = ref(null);

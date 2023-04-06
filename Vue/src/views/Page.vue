@@ -35,8 +35,23 @@ import { h, ref, defineComponent } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NIcon, NLayout, NLayoutSider, NSpace, NMenu } from "naive-ui";
 import { BookmarkOutline, CaretDownOutline } from "@vicons/ionicons5";
-
+import axios from "axios";
+axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 const router = useRouter();
+
+const res = axios({
+  method: "get",
+  url: "/api/user/profile"
+}).catch(err => {
+  console.log(err.response.status)
+  if (err.response.status == 403) {
+    localStorage.removeItem('token')
+    router.push('/signin')
+  }
+  
+})
+
 
 const menuOptions = [
   {

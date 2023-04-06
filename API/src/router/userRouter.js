@@ -9,6 +9,23 @@ const { access } = require("fs");
 var userApi = express.Router();
 userApi.use(bodyParser.json());
 
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, accessCode) => {
+        console.log(err);
+
+        if (err) return res.sendStatus(403);
+
+        req.accessCode = accessCode;
+
+        next();
+    });
+}
+
 userApi.post("/login", async (req, res) => {
     if (
         req.body?.accessCode === undefined &&
@@ -73,6 +90,17 @@ userApi.post("/register", async (req, res) => {
     console.log(result);
     if (result.affectedRows !== 0) {
         res.json({ success: true });
+    } else {
+        res.json({ success: false });
+    }
+});
+
+userApi.get("/profile", authenticateToken, async (req, res) => {
+    let accessCode = req.accessCode;
+    let sqlQuery = `SELECT * FROM web_user_data WHERE uuid = '${accessCode}'`;
+    const result = await query(sqlQuery);
+    if (result.length !== 0) {
+        res.json({ success: true, data: result });
     } else {
         res.json({ success: false });
     }
