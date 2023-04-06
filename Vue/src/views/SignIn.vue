@@ -12,14 +12,14 @@
       <n-tab-pane name="signin" tab="Login">
         <n-form ref="formRef" :model="formValue" :rules="rules">
           <n-form-item-row path="user.accessCode" label="Access Code">
-            <n-input :disabled="!formValue.user.userName == '' || !formValue.user.password == ''" v-model:value="formValue.user.accessCode" placeholder="Please Input"/>
+            <n-input :disabled="!formValue.user.userName == '' || !formValue.user.password == ''" v-model:value="formValue.user.accessCode" placeholder="Enter your Access Code or User Name and Password"/>
           </n-form-item-row>
           <!-- create a horizontal line with OR in middle -->
           <n-form-item-row path="user.userName" label="User Name">
-            <n-input :disabled="!formValue.user.accessCode == ''" v-model:value="formValue.user.userName" placeholder="Please Input"/>
+            <n-input :disabled="!formValue.user.accessCode == ''" v-model:value="formValue.user.userName" placeholder="Enter your Access Code or User Name and Password"/>
           </n-form-item-row>
           <n-form-item-row path="user.password" label="Password">
-            <n-input type="password" :disabled="!formValue.user.accessCode  == ''" v-model:value="formValue.user.password" placeholder="Please Input"/>
+            <n-input type="password" :disabled="!formValue.user.accessCode  == ''" v-model:value="formValue.user.password" placeholder="Enter your Access Code or User Name and Password"/>
           </n-form-item-row>
         </n-form>
         <n-button @click=handleValidateClick type="primary" block secondary strong>
@@ -32,7 +32,7 @@
             <n-input v-model:value="registerValue.user.userName" placeholder="Enter your user name"/>
           </n-form-item-row>
           <n-form-item-row path="user.password" label="Password">
-            <n-input type="password" v-model:value="registerValue.user.password" placeholder="Enter your password"/>
+            <n-input min type="password" v-model:value="registerValue.user.password" placeholder="Enter your password"/>
           </n-form-item-row>
           <n-form-item-row first ref="rPasswordFormItemRef" path="user.rePassword" label="Re-Password">
             <n-input type="password" :disabled="!registerValue.user.password" v-model:value="registerValue.user.rePassword" placeholder="Enter your password again"/>
@@ -129,8 +129,9 @@ const registerRules = ref({
           },
           password: {
             required: true,
-            message: "Please enter you password",
-            trigger: ["input", "blur"]
+            message: "Please enter you password include at least 8 characters",
+            trigger: ["input", "blur"],
+            min: 8, 
           },
           rePassword: [
             {
@@ -141,7 +142,7 @@ const registerRules = ref({
             {
               validator: validatePasswordSame,
               message: "Password is not same as re-entered password!",
-              trigger: ["blur","input"]
+              trigger: "blur"
             },
             {
             validator: validatePasswordStartWith,
