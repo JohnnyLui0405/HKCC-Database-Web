@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import SignIn from "../views/SignIn.vue";
 import UserProfile from "../views/Page.vue";
 import Test from "../components/Test.vue";
+import logout from "../components/logout.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -11,7 +12,10 @@ const router = createRouter({
             path: "/profile",
             name: "Profile",
             component: UserProfile,
-            children: [{ path: "test", component: Test }],
+            children: [
+                { path: "test", component: Test },
+                { path: "logout", component: logout },
+            ],
         },
     ],
 });

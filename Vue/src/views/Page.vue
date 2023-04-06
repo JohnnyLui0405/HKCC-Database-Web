@@ -62,6 +62,14 @@ const menuOptions = [
     ),
     key: "home"
   },
+  {
+    label: h(
+      RouterLink,
+      { to: "/profile/logout" },
+      { default: () => "Logout" }
+    ),
+    key: "logout"
+  },
 ];
 
 const collapse = ref(true)

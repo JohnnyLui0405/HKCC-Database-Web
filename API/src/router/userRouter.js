@@ -65,7 +65,7 @@ userApi.post("/login", async (req, res) => {
             { _id: result.accessCode },
             process.env.TOKEN_SECRET,
             {
-                expiresIn: "1 day",
+                expiresIn: "10m",
             }
         );
         res.send({ success: true, token });
