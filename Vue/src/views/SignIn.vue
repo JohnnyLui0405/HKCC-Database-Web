@@ -1,28 +1,31 @@
 <template>
   <div class="container">
     <n-card id="loginCard">
-      <n-tabs class="card-tabs" default-value="signin" size="large" animated style="margin: 0 -4px"
+      <n-tabs class="card-tabs" default-value="logInCode" size="large" animated style="margin: 0 -4px"
         pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;">
-        <n-tab-pane name="signin" tab="Login">
-          <n-form ref="formRef" :model="formValue" :rules="rules">
+        <n-tab-pane name="logInCode" tab="Login with Code">
+          <n-form ref="logInCodeRef" :model="logInCodeValue" :rules="logInCodeRules">
             <n-form-item-row path="user.accessCode" label="Access Code">
-              <n-input @keydown.enter.prevent="handleValidateClick" :disabled="
-                !formValue.user.userName == '' ||
-                !formValue.user.password == ''
-              " v-model:value="formValue.user.accessCode" placeholder="Enter your Access Code" />
-            </n-form-item-row>
-            <!-- create a horizontal line with OR in middle -->
-            <n-form-item-row path="user.userName" label="User Name">
-              <n-input @keydown.enter.prevent="handleValidateClick" :disabled="!formValue.user.accessCode == ''"
-                v-model:value="formValue.user.userName" placeholder="Enter your User Name and Password" />
-            </n-form-item-row>
-            <n-form-item-row path="user.password" label="Password">
-              <n-input @keydown.enter.prevent="handleValidateClick" type="password"
-                :disabled="!formValue.user.accessCode == ''" v-model:value="formValue.user.password"
-                placeholder="Enter your User Name and Password" />
+              <n-input @keydown.enter.prevent="handleCodeLogin" v-model:value="logInCodeValue.user.accessCode"
+                placeholder="Enter your Access Code" />
             </n-form-item-row>
           </n-form>
-          <n-button @click="handleValidateClick" type="primary" block secondary strong>
+          <n-button @click="handleCodeLogin" type="primary" block secondary strong>
+            Login
+          </n-button>
+        </n-tab-pane>
+        <n-tab-pane name="logInpw" tab="Login with Password">
+          <n-form ref="logInPWRef" :model="logInPWValue" :rules="logInPWRules">
+            <n-form-item-row path="user.userName" label="User Name">
+              <n-input @keydown.enter.prevent="handlePasswordLogin" v-model:value="logInPWValue.user.userName"
+                placeholder="Enter your User Name" />
+            </n-form-item-row>
+            <n-form-item-row path="user.password" label="Password">
+              <n-input @keydown.enter.prevent="handlePasswordLogin" type="password"
+                v-model:value="logInPWValue.user.password" placeholder="Enter your Password" />
+            </n-form-item-row>
+          </n-form>
+          <n-button @click="handlePasswordLogin" type="primary" block secondary strong>
             Login
           </n-button>
         </n-tab-pane>
@@ -71,8 +74,9 @@ import axios from "axios";
 axios.defaults.baseURL = "https://dbprojectapi.courtcloud.me";
 // axios.defaults.baseURL = 'http://localhost:3310';
 const router = useRouter();
-const formRef = ref(null);
 const registerRef = ref(null);
+const logInCodeRef = ref(null);
+const logInPWRef = ref(null);
 const rPasswordFormItemRef = ref(null);
 const message = useMessage();
 const size = ref("medium");
@@ -88,31 +92,14 @@ function validatePasswordSame(rule, value) {
   console.log(registerValue.value.user.password);
   return value === registerValue.value.user.password;
 }
-function validateAccessCodeLogin(rule, value) {
-  if (
-    formValue.value.user.userName == "" &&
-    formValue.value.user.password == ""
-  ) {
-    if (!value) {
-      return new Error(
-        "Either Access Code or User Name and Password is required"
-      );
-    }
-  }
-}
-function validateUserPasswordLogin(rule, value) {
-  if (formValue.value.user.accessCode == "") {
-    if (!value) {
-      return new Error(
-        "Either Access Code or User Name and Password is required"
-      );
-    }
-  }
-}
 
-const formValue = ref({
+const logInCodeValue = ref({
   user: {
     accessCode: "",
+  },
+});
+const logInPWValue = ref({
+  user: {
     userName: "",
     password: "",
   },
@@ -124,24 +111,27 @@ const registerValue = ref({
     rePassword: "",
   },
 });
-const rules = ref({
+const logInCodeRules = ref({
   user: {
     accessCode: {
-      required: false,
-      validator: validateAccessCodeLogin,
-      trigger: "blur",
-    },
+      required: true,
+      trigger: "blur"
+    }
+  }
+});
+const logInPWRules = ref({
+  user: {
     userName: {
-      required: false,
-      validator: validateUserPasswordLogin,
+      required: true,
+      message: "User Name is required",
       trigger: "blur",
     },
     password: {
-      required: false,
-      validator: validateUserPasswordLogin,
-      trigger: "blur",
+      required: true,
+      message: "Password is required",
+      trigger: ["input", "blur"],
     },
-  },
+  }
 });
 const registerRules = ref({
   user: {
@@ -177,24 +167,50 @@ const registerRules = ref({
 });
 
 const loadingBar = useLoadingBar();
-const handleValidateClick = (e) => {
+const handleCodeLogin = (e) => {
   e.preventDefault();
-  formRef.value?.validate(async (errors) => {
+  logInCodeRef.value?.validate(async (errors) => {
     if (!errors) {
       loadingBar.start();
       const res = await axios({
         method: "post",
         url: "/api/user/login",
         data: {
-          accessCode: formValue.value.user.accessCode,
-          userName: formValue.value.user.userName,
-          password: formValue.value.user.password,
+          accessCode: logInCodeValue.value.user.accessCode
         },
       });
       if (res.data.success) {
         message.success("Login Success");
         localStorage.setItem("token", res.data.token);
-        router.push("/profile");
+        router.push("/profile/home");
+        loadingBar.finish();
+      } else {
+        message.error("Login Failed");
+        loadingBar.error();
+      }
+    } else {
+      console.log(errors);
+      message.error("Invalid");
+    }
+  });
+};
+const handlePasswordLogin = (e) => {
+  e.preventDefault();
+  logInPWRef.value?.validate(async (errors) => {
+    if (!errors) {
+      loadingBar.start();
+      const res = await axios({
+        method: "post",
+        url: "/api/user/login",
+        data: {
+          userName: logInPWValue.value.user.userName,
+          password: logInPWValue.value.user.password,
+        },
+      });
+      if (res.data.success) {
+        message.success("Login Success");
+        localStorage.setItem("token", res.data.token);
+        router.push("/profile/home");
         loadingBar.finish();
       } else {
         message.error("Login Failed");

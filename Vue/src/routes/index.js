@@ -1,8 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import SignIn from "../views/SignIn.vue";
 import UserProfile from "../views/Page.vue";
-import Test from "../components/Test.vue";
-import logout from "../components/logout.vue";
+import Logout from "../components/logout.vue";
+import Home from "../components/home.vue";
+import PlayData from "../components/playData.vue";
+import Event from "../components/event.vue";
+import Collection from "../components/collection.vue";
+import Options from "../components/options.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -13,8 +17,12 @@ const router = createRouter({
             name: "Profile",
             component: UserProfile,
             children: [
-                { path: "test", component: Test },
-                { path: "logout", component: logout },
+                { path: "home", component: Home },
+                { path: "playData", component: PlayData },
+                { path: "event", component: Event },
+                { path: "collection", component: Collection },
+                { path: "options", component: Options },
+                { path: "logout", component: Logout },
             ],
         },
     ],

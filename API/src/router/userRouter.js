@@ -15,12 +15,11 @@ function authenticateToken(req, res, next) {
 
     if (token == null) return res.sendStatus(401);
 
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, accessCode) => {
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, result) => {
         console.log(err);
 
         if (err) return res.sendStatus(403);
-
-        req.accessCode = accessCode;
+        req.felicaCardID = result.felicaCardID;
 
         next();
     });
@@ -40,7 +39,7 @@ userApi.post("/login", async (req, res) => {
     let sqlQuery;
 
     if (accessCode) {
-        sqlQuery = `SELECT luid as accessCode FROM ext_felica_card WHERE luid = '${accessCode}'`;
+        sqlQuery = `SELECT ext_id as extID FROM ext_felica_card WHERE luid = '${accessCode}'`;
     } else if (userName && password) {
         let saltedPassword = crypto
             .createHash("md5")
@@ -50,7 +49,7 @@ userApi.post("/login", async (req, res) => {
             SELECT
                 wud.uuid as userUUID,
                 wud.username as userName,
-                efc.luid as accessCode
+                efc.ext_id as extID
             FROM
                 web_user_data wud
             JOIN ext_felica_card efc ON efc.id = wud.felica_code 
@@ -61,11 +60,12 @@ userApi.post("/login", async (req, res) => {
 
     const result = await query(sqlQuery);
     if (result.length !== 0) {
+        console.log(result[0].extID);
         const token = jwt.sign(
-            { _id: result.accessCode },
+            { felicaCardID: result[0].extID },
             process.env.TOKEN_SECRET,
             {
-                expiresIn: "10m",
+                expiresIn: "1h",
             }
         );
         res.send({ success: true, token });
@@ -106,13 +106,24 @@ userApi.get("/profile", authenticateToken, async (req, res) => {
     }
 });
 
-userApi.put("/", (req, res) => {
-    user.age += 1;
-    res.json("return user info is " + JSON.stringify(user));
-});
-
-userApi.delete("/", (req, res) => {
-    res.send("user is deleted : " + user.name);
+userApi.post("/getUserInfo", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+    let sqlQuery = `
+    SELECT
+        user_name as userName,
+        register_time as registerTime,
+        access_time as accessTime,
+        battle_point as battlePoint,
+        last_game_date as lastGameDate
+    FROM
+        ext_felica_card
+    JOIN user_data ON
+        user_data.felica_card_id = ext_felica_card.id
+    WHERE
+        ext_id = '${extID}'
+    `;
+    const result = await query(sqlQuery);
+    res.json({ success: true, data: result });
 });
 
 module.exports = userApi;
