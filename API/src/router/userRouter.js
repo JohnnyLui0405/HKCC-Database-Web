@@ -126,4 +126,31 @@ userApi.post("/getUserInfo", authenticateToken, async (req, res) => {
     res.json({ success: true, data: result });
 });
 
+userApi.post("/getEvents", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let filterValues = req.body?.filterValues;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT Event_name as eventName, startTime, endTime FROM game_event ge
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY Event_name ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM game_event`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
+});
+
 module.exports = userApi;
