@@ -47,8 +47,9 @@ userApi.post("/login", async (req, res) => {
             .digest("hex");
         sqlQuery = `
             SELECT
-                wud.uuid as userUUID,
+                wud.id as userUUID,
                 wud.username as userName,
+                wud.isAdmin as isAdmin,
                 efc.ext_id as extID
             FROM
                 web_user_data wud
@@ -60,15 +61,22 @@ userApi.post("/login", async (req, res) => {
 
     const result = await query(sqlQuery);
     if (result.length !== 0) {
-        console.log(result[0].extID);
+        console.log(result[0]);
         const token = jwt.sign(
-            { felicaCardID: result[0].extID },
+            { felicaCardID: result[0].extID, isAdmin: result[0].isAdmin },
             process.env.TOKEN_SECRET,
             {
-                expiresIn: "1h",
+                expiresIn: "1d",
             }
         );
-        res.send({ success: true, token });
+        res.send({
+            success: true,
+            token,
+            payload: {
+                felicaCardID: result[0].extID,
+                isAdmin: result[0].isAdmin,
+            },
+        });
     } else {
         res.json({ success: false });
     }
@@ -85,7 +93,7 @@ userApi.post("/register", async (req, res) => {
         .createHash("md5")
         .update(password + process.env.SALT)
         .digest("hex");
-    let sqlQuery = `INSERT INTO web_user_data (uuid, username, felica_code, password_salted) VALUES ('${uuidv1()}','${username}', '1','${saltedPassword}')`;
+    let sqlQuery = `INSERT INTO web_user_data ( username, felica_code, password_salted) VALUES ('${username}', '1','${saltedPassword}')`;
     const result = await query(sqlQuery);
     console.log(result);
     if (result.affectedRows !== 0) {
@@ -151,6 +159,41 @@ userApi.post("/getEvents", authenticateToken, async (req, res) => {
         data: result,
         totalRecords: count,
     });
+});
+
+userApi.post("/getUserOptions", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+    let sqlQuery = `
+    SELECT 
+        ud.user_id,
+        abort,
+        color_field as colorField,
+        color_lane as colorLane,
+        color_wall as colorWall,
+        disp_battle_pt as dispBattlePt,
+        disp_player_lv as dispPlayerLv,
+        headphone_amp as headphoneAMP,
+        adj_judge_tA as adjJudgeTA,
+        adj_judge_tB as adjJudgeTB,
+        disp_judge_type as dispJudgeType,
+        tap_sound as tapSound,
+        break_sound as breakSound,
+        IsMirror as isMirror,
+        Tap_amp as tapAMP,
+        Bell_amp as bellAMP,
+        CBreak_amp as CBreakAMP,
+        Hold_amp as holdAMP
+    FROM
+        ext_felica_card efc
+    JOIN user_data ud ON
+        ud.felica_card_id = efc.id
+    JOIN user_game_opts ugo ON
+        ugo.user_id = ud.user_id
+    WHERE 
+        efc.ext_id = '${extID}';
+    `;
+    const result = await query(sqlQuery);
+    res.json({ success: true, data: result });
 });
 
 module.exports = userApi;
