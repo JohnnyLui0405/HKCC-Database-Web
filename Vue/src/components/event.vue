@@ -1,16 +1,47 @@
 <template>
   <div class="container">
-    <n-data-table remote ref="table" :columns="columns" :data="data" :loading="loading" :pagination="pagination"
-      :row-key="rowKey" @update:sorter="handleSorterChange" @update:filters="handleFiltersChange"
-      @update:page="handlePageChange" />
+    <n-space vertical>
+      <n-button v-if="isAdmin == 1" @Click="showModal = true">Create New Event</n-button>
+      <n-modal v-model:show="showModal">
+        <n-card style="width: 600px" title="Create New Event" :bordered="false" size="huge" role="dialog"
+          aria-modal="true">
+          <template #header-extra>
+
+          </template>
+          <n-form ref="formRef" :model="model" :rules="rules" label-placement="top" require-mark-placement="right-hanging"
+            :size="size" :style="{
+              maxWidth: '640px'
+            }">
+            <n-form-item label="Event Name" path="eventName">
+              <n-input v-model:value="model.eventName" placeholder="Input" />
+            </n-form-item>
+            <n-form-item label="Start Time" path="startEndTime">
+              <n-date-picker v-model:value="model.startEndTime" type="datetimerange" clearable update-value-on-close
+                :is-date-disabled="disablePreviousDate" />
+            </n-form-item>
+          </n-form>
+          <template #footer>
+            <n-button @Click="handleSaveClick">Save</n-button>
+          </template>
+        </n-card>
+      </n-modal>
+      <n-data-table remote ref="table" :columns="columns" :data="data" :loading="loading" :pagination="pagination"
+        :row-key="rowKey" @update:sorter="handleSorterChange" @update:filters="handleFiltersChange"
+        @update:page="handlePageChange" />
+    </n-space>
   </div>
 </template>
 
 <script>
 import { defineComponent, ref, reactive, onMounted } from 'vue'
 import axios from 'axios'
-axios.defaults.baseURL = 'http://localhost:3310';
+import { useLoadingBar, useMessage } from 'naive-ui'
+axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+
+const formRef = ref()
+
+
 
 const eventName = {
   title: 'Event Name',
@@ -58,7 +89,7 @@ async function query(page, pageSize = 5, order = 'ascend', filterValues = []) {
   order = order === 'descend' ? 'desc' : 'asc'
   const res = await axios({
     method: "post",
-    url: "http://localhost:3310/api/user/getEvents",
+    url: "/api/user/getEvents",
     data: {
       page: page,
       pageSize: pageSize,
@@ -72,6 +103,56 @@ async function query(page, pageSize = 5, order = 'ascend', filterValues = []) {
 
 export default defineComponent({
   setup() {
+    const loadingBar = useLoadingBar()
+    const message = useMessage()
+    const model = ref({
+      eventName: null,
+      startEndTime: null,
+    })
+    const rules = ref({
+      eventName: [
+        {
+          required: true,
+          message: 'Please input event name',
+          trigger: 'blur'
+        }
+      ],
+      startEndTime: [
+        {
+          type: 'array',
+          required: true,
+          message: 'Please input start time',
+          trigger: 'blur'
+        }
+      ]
+    })
+    const handleSaveClick = (e) => {
+      e.preventDefault();
+      formRef.value?.validate(async (errors) => {
+        if (!errors) {
+          loadingBar.start();
+          const res = await axios({
+            method: "post",
+            url: "/api/admin/createEvent",
+            data: {
+              eventName: model.value.eventName,
+              startTime: model.value.startEndTime[0],
+              endTime: model.value.startEndTime[1],
+            },
+          });
+          if (res.data.success) {
+            message.success("Create New Event Success");
+            loadingBar.finish();
+          } else {
+            message.error("Create New Event Failed");
+            loadingBar.error();
+          }
+        } else {
+          console.log(errors);
+          message.error("Invalid");
+        }
+      });
+    };
     const dataRef = ref([])
     const loadingRef = ref(true)
     const columnsRef = ref(columns)
@@ -102,6 +183,15 @@ export default defineComponent({
     })
 
     return {
+      formRef,
+      rules,
+      handleSaveClick,
+      disablePreviousDate(ts) {
+        return ts <= new Date(Date.now()) - 24 * 60 * 60 * 1000
+      },
+      model: model,
+      showModal: ref(false),
+      isAdmin: localStorage.getItem('isAdmin'),
       data: dataRef,
       columns: columnsRef,
       eventName: eventNameReactive,

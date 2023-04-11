@@ -181,7 +181,9 @@ const handleCodeLogin = (e) => {
       });
       if (res.data.success) {
         message.success("Login Success");
+        console.log(res.data)
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("isAdmin", res.data.payload.isAdmin)
         router.push("/profile/home");
         loadingBar.finish();
       } else {
@@ -210,6 +212,7 @@ const handlePasswordLogin = (e) => {
       if (res.data.success) {
         message.success("Login Success");
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("isAdmin", res.data.payload.isAdmin)
         router.push("/profile/home");
         loadingBar.finish();
       } else {

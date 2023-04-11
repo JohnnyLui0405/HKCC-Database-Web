@@ -7,6 +7,7 @@ import PlayData from "../components/playData.vue";
 import Event from "../components/event.vue";
 import Collection from "../components/collection.vue";
 import Options from "../components/options.vue";
+import WebUser from "../components/webuser.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -24,6 +25,12 @@ const router = createRouter({
                 { path: "options", component: Options },
                 { path: "logout", component: Logout },
             ],
+        },
+        {
+            path: "/admin",
+            name: "Admin",
+            component: UserProfile,
+            children: [{ path: "webuser", component: WebUser }],
         },
     ],
 });

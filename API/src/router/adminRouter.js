@@ -26,6 +26,30 @@ function authenticateToken(req, res, next) {
     });
 }
 
+adminApi.post("/createEvent", authenticateToken, async (req, res) => {
+    let eventName = req.body?.eventName;
+    // convert eventStartDate from timestamp to date
+    let eventStartDate = req.body?.startTime / 1000;
+    // convert eventEndDate from timestamp to date
+    let eventEndDate = req.body?.endTime / 1000;
+    console.log(eventStartDate);
+    let sqlQuery = `INSERT INTO game_event (event_name, startTime, endTime) VALUES ('${eventName}', FROM_UNIXTIME(${eventStartDate}), FROM_UNIXTIME(${eventEndDate}))`;
+    const result = await query(sqlQuery);
+
+    if (result.insertId) {
+        const insertId = result.insertId.toString();
+        res.json({
+            success: true,
+            data: insertId,
+        });
+    } else {
+        res.json({
+            success: false,
+            data: "Error",
+        });
+    }
+});
+
 adminApi.post("/getWebUsers", authenticateToken, async (req, res) => {
     let page = req.body?.page - 1;
     let limit = req.body?.pageSize;

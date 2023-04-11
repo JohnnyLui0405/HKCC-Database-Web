@@ -170,12 +170,12 @@ userApi.post("/getUserOptions", authenticateToken, async (req, res) => {
         color_field as colorField,
         color_lane as colorLane,
         color_wall as colorWall,
-        disp_battle_pt as dispBattlePt,
-        disp_player_lv as dispPlayerLv,
+        disp_battle_pt as displayBattlePoint,
+        disp_player_lv as displayPlayerLevel,
         headphone_amp as headphoneAMP,
         adj_judge_tA as adjJudgeTA,
         adj_judge_tB as adjJudgeTB,
-        disp_judge_type as dispJudgeType,
+        disp_judge_type as displayJudgeType,
         tap_sound as tapSound,
         break_sound as breakSound,
         IsMirror as isMirror,
@@ -194,6 +194,42 @@ userApi.post("/getUserOptions", authenticateToken, async (req, res) => {
     `;
     const result = await query(sqlQuery);
     res.json({ success: true, data: result });
+});
+
+userApi.post("/updateUserOptions", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+
+    // update user_game_opts
+    let data = req.body?.data;
+    let sqlQuery = `
+    UPDATE user_game_opts ugo
+    JOIN user_data ud ON
+        ud.user_id = ugo.user_id
+    JOIN ext_felica_card efc ON
+        efc.id = ud.felica_card_id
+    SET
+        abort = ${data.abort},
+        color_field = ${data.colorField},   
+        color_lane = ${data.colorLane},
+        color_wall = ${data.colorWall},
+        disp_battle_pt = ${data.displayBattlePoint},
+        disp_player_lv = ${data.displayPlayerLevel},
+        headphone_amp = ${data.headphoneAMP},
+        adj_judge_tA = ${data.adjJudgeTA},
+        adj_judge_tB = ${data.adjJudgeTB},
+        disp_judge_type = '${data.displayJudgeType}',
+        tap_sound = ${data.tapSound},
+        break_sound = ${data.breakSound},
+        IsMirror = ${data.isMirror},
+        Tap_amp = ${data.tapAMP},
+        Bell_amp = ${data.bellAMP},
+        CBreak_amp = ${data.CBreakAMP},
+        Hold_amp = ${data.holdAMP}
+    WHERE
+        efc.ext_id = '${extID}';
+    `;
+    const result = await query(sqlQuery);
+    res.json({ success: true });
 });
 
 module.exports = userApi;

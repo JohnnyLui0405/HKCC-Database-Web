@@ -13,6 +13,7 @@ async function query(sqlQuery) {
         console.log(sqlQuery);
         conn = await pool.getConnection();
         const res = await conn.query(sqlQuery);
+        console.log(res);
         return res;
         // rows: [ {val: 1}, meta: ... ]
         // res: { affectedRows: 1, insertId: 1, warningStatus: 0 }

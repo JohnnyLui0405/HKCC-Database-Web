@@ -18,7 +18,7 @@
 import { h, ref, defineComponent, render } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NIcon, NLayout, NLayoutSider, NSpace, NMenu } from "naive-ui";
-import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon } from "@vicons/ionicons5";
+import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon, IdCardOutline, PersonOutline } from "@vicons/ionicons5";
 import axios from "axios";
 axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
@@ -39,7 +39,7 @@ const res = axios({
 
 })
 
-const menuOptions = [
+let menuOptions = [
   {
     label: () => h(
       RouterLink,
@@ -92,17 +92,48 @@ const menuOptions = [
     ),
     key: "options",
     icon: renderIcon(OptionsIcon)
-  },
-  {
-    label: () => h(
-      RouterLink,
-      { to: "/profile/logout" },
-      { default: () => "Logout" }
-    ),
-    key: "logout",
-    icon: renderIcon(LogOutIcon)
-  },
+  }
+
 ];
+
+if (localStorage.getItem('isAdmin') == 1) {
+  console.log("adding admin")
+  menuOptions.push({
+    label: "Admin",
+    key: "admin",
+    icon: renderIcon(IdCardOutline),
+    children: [
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/webuser" },
+          { default: () => "Web User Manage" }
+        ),
+        key: "webUserManage",
+        icon: renderIcon(PersonOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gamecard" },
+          { default: () => "Game Card" }
+        ),
+        key: "gameCard",
+        icon: renderIcon(LogOutIcon)
+      },
+    ]
+  })
+}
+
+menuOptions.push({
+  label: () => h(
+    RouterLink,
+    { to: "/profile/logout" },
+    { default: () => "Logout" }
+  ),
+  key: "logout",
+  icon: renderIcon(LogOutIcon)
+},)
 
 const collapse = ref(true)
 </script>
