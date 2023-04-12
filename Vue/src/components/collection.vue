@@ -1,41 +1,55 @@
 <template>
-  <n-space vertical size="large">
-    <n-layout>
-      <n-layout-header>Yiheyuan Road</n-layout-header>
-      <n-layout-content content-style="padding: 24px;">
-        Pingshan Road
-      </n-layout-content>
-      <n-layout-footer>Chengfu Road</n-layout-footer>
-    </n-layout>
-    <n-layout>
-      <n-layout-header>Yiheyuan Road</n-layout-header>
-      <n-layout has-sider>
-        <n-layout-sider content-style="padding: 24px;">
-          Handian Bridge
-        </n-layout-sider>
-        <n-layout-content content-style="padding: 24px;">
-          Pingshan Road
-        </n-layout-content>
-      </n-layout>
-      <n-layout-footer>Chengfu Road</n-layout-footer>
-    </n-layout>
-    <n-layout has-sider>
-      <n-layout-sider content-style="padding: 24px;">
-        Handian Bridge
-      </n-layout-sider>
-      <n-layout>
-        <n-layout-header>Yiheyuan Road</n-layout-header>
-        <n-layout-content content-style="padding: 24px;">
-          Pingshan Road
-        </n-layout-content>
-        <n-layout-footer>Chengfu Road</n-layout-footer>
-      </n-layout>
-    </n-layout>
-  </n-space>
+  <div class="container">
+    <n-grid x-gap="12" y-gap="6" :cols="3">
+      <template v-if="!loading" v-for="(item, index) in data">
+        deckID: {{ item.deckID }}<br>
+        <n-gi v-for="(card, index2) in item.children">
+          <n-card height="600 px">
+            Card Name: {{ card.cardName }}<br>
+            Attribute: {{ card.attribute }}<br>
+            School: {{ card.school }}<br>
+            Section: {{ card.section }}<br>
+            Rarity: {{ card.rarity }}
+          </n-card>
+        </n-gi>
+      </template>
+    </n-grid>
+  </div>
 </template>
 
 <script setup>
-import { NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NLayoutSider, NSpace } from "naive-ui";
+import { parseStringStyle } from "@vue/shared";
+import axios from "axios";
+import { NGrid, NGridItem, NCard, NSkeleton, NStatistic, NNumberAnimation, NTime } from "naive-ui";
+import { onMounted, ref } from "vue";
+axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+const loading = ref(true);
+let userData = null;
+let data = null;
+
+axios({
+  method: "post",
+  url: "/api/user/getUserGameDeck"
+}).catch(err => {
+  console.log(err.response.status)
+  if (err.response.status == 403) {
+    localStorage.removeItem('token')
+    router.push('/signin')
+  }
+}).then(
+  res => {
+    console.log(res.data.data)
+    data = res.data.data.reduce((r, { deckID: deckID, ...object }) => {
+      var temp = r.find((o) => o.deckID === deckID);
+      if (!temp) r.push((temp = { deckID, children: [] }));
+      temp.children.push(object);
+      return r;
+    }, []);
+    console.log(data)
+    loading.value = false;
+  }
+)
 </script>
 
 <style scoped>

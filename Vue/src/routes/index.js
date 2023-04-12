@@ -8,6 +8,9 @@ import Event from "../components/event.vue";
 import Collection from "../components/collection.vue";
 import Options from "../components/options.vue";
 import WebUser from "../components/webuser.vue";
+import GameCard from "../components/gamecard.vue";
+import GameMission from "../components/gamemission.vue";
+import GameMusic from "../components/gameMusic.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -30,7 +33,21 @@ const router = createRouter({
             path: "/admin",
             name: "Admin",
             component: UserProfile,
-            children: [{ path: "webuser", component: WebUser }],
+            children: [
+                { path: "webuser", component: WebUser },
+                {
+                    path: "gameCard",
+                    component: GameCard,
+                },
+                {
+                    path: "gameMusic",
+                    component: GameMusic,
+                },
+                {
+                    path: "gameMission",
+                    component: GameMission,
+                },
+            ],
         },
     ],
 });

@@ -126,13 +126,99 @@ adminApi.post("/updateWebUser", authenticateToken, async (req, res) => {
     SET
         username = '${req.body.userName}',
         felica_code = '${req.body.felicaCode}',
-        isInitalLogin = ${req.body.isInitalLogin},
         isAdmin = ${req.body.isAdmin}
+    `;
+    if (req.body?.password !== "") {
+        let saltedPassword = crypto
+            .createHash("md5")
+            .update(req.body?.password + process.env.SALT)
+            .digest("hex");
+        sqlQuery += `
+        , password_salted = '${saltedPassword}'
+        `;
+    }
+    sqlQuery += `
     WHERE
-        uuid = '${req.body.uuid}'
+        id = ${req.body.uuid}
     `;
     let result = await query(sqlQuery);
-    res.send({ success: true, data: result });
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/deleteWebUser", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    DELETE FROM
+        web_user_data
+    WHERE
+        id = ${req.body.uuid}
+        `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, deleteId: result.insertId.toString() });
+});
+
+adminApi.post("/getGameMusic", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let filterValues = req.body?.filterValues;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT
+        id as musicID,
+        name,
+        sort_name as sortName,
+        artist_name as artistName,
+        genre,
+        boss_card_id as bossCardID,
+        boss_level as bossLevel,
+        note_count as noteCount,
+        bell_count as bellCount
+    FROM
+        game_music gm
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY sort_name ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM game_music`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
+});
+
+adminApi.post("/getGameMission", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let filterValues = req.body?.filterValues;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT * FROM view_game_mission
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY missionName ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM view_game_mission`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
 });
 
 module.exports = adminApi;

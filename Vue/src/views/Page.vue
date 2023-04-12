@@ -18,7 +18,7 @@
 import { h, ref, defineComponent, render } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NIcon, NLayout, NLayoutSider, NSpace, NMenu } from "naive-ui";
-import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon, IdCardOutline, PersonOutline } from "@vicons/ionicons5";
+import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon, IdCardOutline, PersonOutline, CardOutline, MusicalNotesOutline, ReceiptOutline } from "@vicons/ionicons5";
 import axios from "axios";
 axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
@@ -115,11 +115,29 @@ if (localStorage.getItem('isAdmin') == 1) {
       {
         label: () => h(
           RouterLink,
-          { to: "/admin/gamecard" },
+          { to: "/admin/gameCard" },
           { default: () => "Game Card" }
         ),
         key: "gameCard",
-        icon: renderIcon(LogOutIcon)
+        icon: renderIcon(CardOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameMusic" },
+          { default: () => "Game Music" }
+        ),
+        key: "gameMusic",
+        icon: renderIcon(MusicalNotesOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameMission" },
+          { default: () => "Game Mission" }
+        ),
+        key: "gameMission",
+        icon: renderIcon(ReceiptOutline)
       },
     ]
   })

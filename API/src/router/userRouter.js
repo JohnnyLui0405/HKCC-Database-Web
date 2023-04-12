@@ -232,4 +232,35 @@ userApi.post("/updateUserOptions", authenticateToken, async (req, res) => {
     res.json({ success: true });
 });
 
+userApi.post("/getUserGameDeck", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+    let sqlQuery = `
+    SELECT
+        vugd.user_id as userID,
+        deck_id as deckID,
+        card_name as cardName,
+        nick_name as nickName,
+        attribute,
+        character_id as characterId,
+        school,
+        section,
+        rarity ,
+        skill_id as skill_id,
+        cho_kaika_skill_id as chokaikaSkillId,
+        card_number as cardNumber,
+        version
+    FROM
+        view_user_game_deck vugd
+    JOIN user_data ud ON
+        ud.user_id = vugd.user_id
+    JOIN ext_felica_card efc ON
+        efc.id = ud.felica_card_id
+    WHERE
+        efc.ext_id = ${extID}
+    ORDER BY
+        deckID ASC;`;
+    const result = await query(sqlQuery);
+    res.json({ success: true, data: result });
+});
+
 module.exports = userApi;
