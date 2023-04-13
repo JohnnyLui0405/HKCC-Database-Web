@@ -1,41 +1,20 @@
 <template>
-  <n-space vertical size="large">
-    <n-layout>
-      <n-layout-header>Yiheyuan Road</n-layout-header>
-      <n-layout-content content-style="padding: 24px;">
-        Pingshan Road
-      </n-layout-content>
-      <n-layout-footer>Chengfu Road</n-layout-footer>
-    </n-layout>
-    <n-layout>
-      <n-layout-header>Yiheyuan Road</n-layout-header>
-      <n-layout has-sider>
-        <n-layout-sider content-style="padding: 24px;">
-          Handian Bridge
-        </n-layout-sider>
-        <n-layout-content content-style="padding: 24px;">
-          Pingshan Road
-        </n-layout-content>
-      </n-layout>
-      <n-layout-footer>Chengfu Road</n-layout-footer>
-    </n-layout>
-    <n-layout has-sider>
-      <n-layout-sider content-style="padding: 24px;">
-        Handian Bridge
-      </n-layout-sider>
-      <n-layout>
-        <n-layout-header>Yiheyuan Road</n-layout-header>
-        <n-layout-content content-style="padding: 24px;">
-          Pingshan Road
-        </n-layout-content>
-        <n-layout-footer>Chengfu Road</n-layout-footer>
-      </n-layout>
-    </n-layout>
-  </n-space>
+  <PieChart :chartData="{
+    labels: ['test', '回レ！雪月花'],
+    datasets: [
+      {
+        backgroundColor: '#f87979',
+        data: [19, 1]
+      }
+    ]
+  }" />
 </template>
 
 <script setup>
+import PieChart from "../charts/PieChart.vue";
 import { NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NLayoutSider, NSpace } from "naive-ui";
+
+
 </script>
 
 <style scoped>

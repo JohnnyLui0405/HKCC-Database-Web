@@ -203,6 +203,7 @@ export default defineComponent({
         return rowData.eventName
       },
       handleSorterChange(sorter) {
+        console.log(sorter)
         if (!sorter || sorter.columnKey === 'eventName') {
           if (!loadingRef.value) {
             loadingRef.value = true

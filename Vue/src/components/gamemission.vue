@@ -107,7 +107,7 @@ async function query(page, pageSize = 5, order = 'ascend', filterValues = []) {
     }
   });
   console.log(res.data)
-  return { data: res.data.data, total: parseInt(res.data.totalRecords), pageCount: 15 / pageSize }
+  return { data: res.data.data, total: parseInt(res.data.totalRecords), pageCount: parseInt(res.data.totalRecords) / pageSize }
 
 }
 

@@ -10,7 +10,10 @@ import Options from "../components/options.vue";
 import WebUser from "../components/webuser.vue";
 import GameCard from "../components/gamecard.vue";
 import GameMission from "../components/gamemission.vue";
-import GameMusic from "../components/gameMusic.vue";
+import GameMusic from "../components/gamemusic.vue";
+import GameCardSkill from "../components/gamecardskill.vue";
+import GameCharacter from "../components/gamecharacter.vue";
+import GameReward from "../components/gamereward.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -46,6 +49,18 @@ const router = createRouter({
                 {
                     path: "gameMission",
                     component: GameMission,
+                },
+                {
+                    path: "gameCardSkill",
+                    component: GameCardSkill,
+                },
+                {
+                    path: "gameCharacter",
+                    component: GameCharacter,
+                },
+                {
+                    path: "gameReward",
+                    component: GameReward,
                 },
             ],
         },

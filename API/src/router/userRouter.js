@@ -46,16 +46,16 @@ userApi.post("/login", async (req, res) => {
             .update(password + process.env.SALT)
             .digest("hex");
         sqlQuery = `
-            SELECT
-                wud.id as userUUID,
-                wud.username as userName,
-                wud.isAdmin as isAdmin,
-                efc.ext_id as extID
-            FROM
-                web_user_data wud
-            JOIN ext_felica_card efc ON efc.id = wud.felica_code 
-            WHERE
-                username = '${userName}' AND password_salted = '${saltedPassword}';
+SELECT
+    wud.id as userUUID,
+    wud.username as userName,
+    wud.isAdmin as isAdmin,
+    efc.ext_id as extID
+FROM
+    web_user_data wud
+JOIN ext_felica_card efc ON efc.id = wud.felica_code 
+WHERE
+    username = '${userName}' AND password_salted = '${saltedPassword}';
         `;
     }
 
@@ -103,16 +103,16 @@ userApi.post("/register", async (req, res) => {
     }
 });
 
-userApi.get("/profile", authenticateToken, async (req, res) => {
-    let accessCode = req.accessCode;
-    let sqlQuery = `SELECT * FROM web_user_data WHERE uuid = '${accessCode}'`;
-    const result = await query(sqlQuery);
-    if (result.length !== 0) {
-        res.json({ success: true, data: result });
-    } else {
-        res.json({ success: false });
-    }
-});
+// userApi.get("/profile", authenticateToken, async (req, res) => {
+//     let accessCode = req.accessCode;
+//     let sqlQuery = `SELECT * FROM web_user_data WHERE uuid = '${accessCode}'`;
+//     const result = await query(sqlQuery);
+//     if (result.length !== 0) {
+//         res.json({ success: true, data: result });
+//     } else {
+//         res.json({ success: false });
+//     }
+// });
 
 userApi.post("/getUserInfo", authenticateToken, async (req, res) => {
     let extID = req.felicaCardID;

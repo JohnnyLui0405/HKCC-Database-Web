@@ -137,7 +137,7 @@ const registerRules = ref({
   user: {
     userName: {
       required: true,
-      message: "Password is required",
+      message: "User Name is required",
       trigger: "blur",
     },
     password: {

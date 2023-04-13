@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <n-space vertical>
-      <n-button @Click="showModalCreate = true">Create New User</n-button>
+      <n-button @Click="showModalCreate = true">Create New Reward</n-button>
       <n-modal v-model:show="showModalCreate">
-        <n-card style="width: 600px" title="Create New User" :bordered="false" size="huge" role="dialog"
+        <n-card style="width: 600px" title="Create New Reward" :bordered="false" size="huge" role="dialog"
           aria-modal="true">
           <template #header-extra>
           </template>
@@ -11,15 +11,8 @@
             require-mark-placement="right-hanging" :size="size" :style="{
               maxWidth: '640px'
             }">
-            <n-form-item-row path="userName" label="User Name">
-              <n-input v-model:value="modelCreate.userName" placeholder="Enter your user name" />
-            </n-form-item-row>
-            <n-form-item-row path="password" label="Password">
-              <n-input type="password" v-model:value="modelCreate.password" placeholder="Enter your password" />
-            </n-form-item-row>
-            <n-form-item-row first ref="rPasswordFormItemRef" path="rePassword" label="Re-Password">
-              <n-input type="password" :disabled="!modelCreate.password" v-model:value="modelCreate.rePassword"
-                placeholder="Enter your password again" />
+            <n-form-item-row path="desc" label="Reward Description">
+              <n-input v-model:value="modelCreate.desc" placeholder="Enter Reward Description" />
             </n-form-item-row>
           </n-form>
           <template #footer>
@@ -31,23 +24,14 @@
         :row-key="rowKey" @update:sorter="handleSorterChange" @update:filters="handleFiltersChange"
         @update:page="handlePageChange" />
       <n-modal v-model:show="showModal">
-        <n-card id="options" title="User Manage" style="max-width: 300px;">
+        <n-card id="options" title="Reward Manage" style="max-width: 300px;">
           <n-scrollbar style="max-height: 500px;">
             <n-form v-if="!loading" ref="formRef" :model="model" label-placement="top"
               require-mark-placement="right-hanging" :size="size" :style="{
                 maxWidth: '640px'
               }">
-              <n-form-item label="User Name" path="userName">
-                <n-input v-model:value="model.userName"></n-input>
-              </n-form-item>
-              <n-form-item label="Password" path="password">
-                <n-input type="password" v-model:value="model.password"></n-input>
-              </n-form-item>
-              <n-form-item label="Felica Code" path="userName">
-                <n-input v-model:value="model.felicaCode"></n-input>
-              </n-form-item>
-              <n-form-item label="Is Admin" path="userName">
-                <n-switch v-model:value="model.isAdmin"></n-switch>
+              <n-form-item label="Reward Description" path="userName">
+                <n-input v-model:value="model.desc"></n-input>
               </n-form-item>
             </n-form>
             <n-skeleton v-else text :repeat="10" />
@@ -77,36 +61,29 @@ axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
 
-const uuid = {
-  title: 'uuid',
-  key: 'uuid',
+const id = {
+  title: 'id',
+  key: 'id',
   sorter: true,
   sortOrder: false
 }
 
-const userName = {
-  title: 'User Name',
-  key: 'userName'
+const category = {
+  title: 'Category',
+  key: 'skillCategory'
 }
 
-const felicaCode = {
-  title: 'Felica Code',
-  key: 'felicaCode'
+const desc = {
+  title: 'Reward Description',
+  key: 'skillDesc'
 }
-
-const isAdmin = {
-  title: "isAdmin",
-  key: "isAdmin"
-}
-
 const createColumns = ({
   edit
 }) => {
   return [
-    uuid,
-    userName,
-    felicaCode,
-    isAdmin,
+    id,
+    category,
+    desc,
     {
       title: "Action",
       key: "actions",
@@ -149,7 +126,7 @@ async function query(page, pageSize = 5, order = 'ascend', filterValues = []) {
   order = order === 'descend' ? 'desc' : 'asc'
   const res = await axios({
     method: "post",
-    url: "/api/admin/getWebUsers",
+    url: "/api/admin/getGameCardSkill",
     data: {
       page: page,
       pageSize: pageSize,
@@ -166,18 +143,11 @@ export default defineComponent({
     const loadingBar = useLoadingBar()
     const message = useMessage()
     const model = ref({
-      uuid: "",
-      userName: "",
-      felicaCode: "",
-      isAdmin: "",
-      password: ""
+
     })
     const modelCreate = ref({
-      userName: "",
-      password: "",
-      rePassword: "",
+      desc: ref(null)
     })
-    const rPasswordFormItemRef = ref(null)
     const size = ref('medium')
     const rowKey = ref('uuid')
     const loading = ref(false)
@@ -185,11 +155,19 @@ export default defineComponent({
     const dataRef = ref([])
     const showModal = ref(false)
     const loadingRef = ref(true)
-    const columnsRef = ref()
-    const uuidReactive = reactive(uuid)
-    const userNameReactive = reactive(userName)
-    const felicaCodeReactive = reactive(felicaCode)
-    const isAdminReactive = reactive(isAdmin)
+    const columns = createColumns({
+      edit(row) {
+        console.log(row)
+        showModal.value = true
+        model.value.desc = row.itemDesc
+        model.value.id = row.id
+      }
+    },
+    )
+    const columnsRef = ref(columns)
+    const idReactive = reactive(id)
+    const descReactive = reactive(desc)
+    const categoryReactive = reactive(category)
     const paginationReactive = reactive({
       page: 1,
       pageCount: 1,
@@ -203,8 +181,8 @@ export default defineComponent({
       query(
         paginationReactive.page,
         paginationReactive.pageSize,
-        uuidReactive.sortOrder,
-        userNameReactive.filterOptionValues
+        idReactive.sortOrder,
+        descReactive.filterOptionValues
       ).then((data) => {
         dataRef.value = data.data
         paginationReactive.pageCount = data.pageCount
@@ -218,13 +196,10 @@ export default defineComponent({
       loadingBar.start()
       const res = await axios({
         method: "post",
-        url: "/api/admin/updateWebUser",
+        url: "/api/admin/updateGameCardSkill",
         data: {
-          uuid: model.value.uuid,
-          userName: model.value.userName,
-          felicaCode: model.value.felicaCode,
-          isAdmin: model.value.isAdmin,
-          password: model.value.password
+          id: model.value.id,
+          desc: model.value.desc,
         }
       })
       if (res.data.success) {
@@ -238,8 +213,8 @@ export default defineComponent({
       query(
         paginationReactive.page,
         paginationReactive.pageSize,
-        uuidReactive.sortOrder,
-        userNameReactive.filterOptionValues
+        idReactive.sortOrder,
+        descReactive.filterOptionValues
       ).then((data) => {
         dataRef.value = data.data
         paginationReactive.pageCount = data.pageCount
@@ -253,9 +228,9 @@ export default defineComponent({
       loadingBar.start()
       const res = await axios({
         method: "post",
-        url: "/api/admin/deleteWebUser",
+        url: "/api/admin/deleteGameCardSkill",
         data: {
-          uuid: model.value.uuid,
+          id: model.value.id,
         }
       })
       if (res.data.success) {
@@ -269,8 +244,8 @@ export default defineComponent({
       query(
         paginationReactive.page,
         paginationReactive.pageSize,
-        uuidReactive.sortOrder,
-        userNameReactive.filterOptionValues
+        idReactive.sortOrder,
+        descReactive.filterOptionValues
       ).then((data) => {
         dataRef.value = data.data
         paginationReactive.pageCount = data.pageCount
@@ -287,10 +262,9 @@ export default defineComponent({
           loadingBar.start();
           const res = await axios({
             method: "post",
-            url: "/api/user/register",
+            url: "/api/admin/createGameCardSkill",
             data: {
-              userName: modelCreate.value.userName,
-              password: modelCreate.value.password,
+              desc: modelCreate.value.desc,
             },
           });
           if (res.data.success) {
@@ -307,72 +281,44 @@ export default defineComponent({
       });
     };
     const rulesCreate = ref({
-      userName: {
-        required: true,
-        message: "User Name is required",
-        trigger: "blur"
-      },
-      password: {
-        required: true,
-        message: "Please enter you password include at least 8 characters",
-        trigger: ["input", "blur"],
-        min: 8,
-      },
-      rePassword: [
+      id: [
         {
           required: true,
-          message: "Re-entered password is required",
-          trigger: ["input", "blur"],
-        },
-        {
-          validator: validatePasswordSame,
-          message: "Password is not same as re-entered password!",
+          message: "Please input id",
           trigger: "blur",
         },
+      ],
+      desc: [
         {
-          validator: validatePasswordStartWith,
-          message: "Password is not same as re-entered password!",
-          trigger: "input",
+          required: true,
+          message: "Please input Reward Description",
+          trigger: "blur",
+        },
+      ],
+      cv: [
+        {
+          required: true,
+          message: "Please input cv",
+          trigger: "blur",
         },
       ],
     });
-    function validatePasswordStartWith(rule, value) {
-      return (
-        !!modelCreate.value.password &&
-        modelCreate.value.password.startsWith(value) &&
-        modelCreate.value.password.length >= value.length
-      );
-    }
-    function validatePasswordSame(rule, value) {
-      return value === modelCreate.value.password;
-    }
     return {
       formRef: ref(null),
       formCreateRef,
       rulesCreate,
-      rPasswordFormItemRef,
       handleSaveClick,
       size: size,
       rowKey: rowKey,
+      columns: columnsRef,
       showModal: showModal,
       showModalCreate: showModalCreate,
       data: dataRef,
       model: model,
       modelCreate: modelCreate,
-      columns: createColumns({
-        edit(row) {
-          console.log(row)
-          showModal.value = true
-          model.value.uuid = row.uuid
-          model.value.userName = row.userName
-          model.value.felicaCode = row.felicaCode
-          model.value.isAdmin = row.isAdmin ? true : false
-        }
-      },
-      ),
-      uuid: uuidReactive,
-      userName: userNameReactive,
-      felicaCode: felicaCodeReactive,
+      id: idReactive,
+      desc: descReactive,
+      category: categoryReactive,
       pagination: paginationReactive,
       loading: loadingRef,
       handleValidateButtonClick: handleValidateButtonClick,
@@ -381,16 +327,17 @@ export default defineComponent({
         return rowData.uuid
       },
       handleSorterChange(sorter) {
-        if (!sorter || sorter.columnKey === 'uuid') {
+        console.log(sorter)
+        if (!sorter || sorter.columnKey === 'id') {
           if (!loadingRef.value) {
             loadingRef.value = true
             query(
               paginationReactive.page,
               paginationReactive.pageSize,
               !sorter ? false : sorter.order,
-              userNameReactive.filterOptionValues
+              descReactive.filterOptionValues
             ).then((data) => {
-              uuidReactive.sortOrder = !sorter ? false : sorter.order
+              idReactive.sortOrder = !sorter ? false : sorter.order
               dataRef.value = data.data
               paginationReactive.pageCount = data.pageCount
               paginationReactive.itemCount = data.total
@@ -406,10 +353,10 @@ export default defineComponent({
           query(
             paginationReactive.page,
             paginationReactive.pageSize,
-            uuidReactive.sortOrder,
+            idReactive.sortOrder,
             filterValues
           ).then((data) => {
-            userNameReactive.filterOptionValues = filterValues
+            descReactive.filterOptionValues = filterValues
             dataRef.value = data.data
             paginationReactive.pageCount = data.pageCount
             paginationReactive.itemCount = data.total
@@ -423,8 +370,8 @@ export default defineComponent({
           query(
             currentPage,
             paginationReactive.pageSize,
-            uuidReactive.sortOrder,
-            userNameReactive.filterOptionValues
+            idReactive.sortOrder,
+            descReactive.filterOptionValues
           ).then((data) => {
             dataRef.value = data.data
             paginationReactive.page = currentPage

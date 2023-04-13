@@ -84,41 +84,6 @@ adminApi.post("/getWebUsers", authenticateToken, async (req, res) => {
     });
 });
 
-adminApi.post("/getWebUsers", authenticateToken, async (req, res) => {
-    let page = req.body?.page - 1;
-    let limit = req.body?.pageSize;
-    let filterValues = req.body?.filterValues;
-    let order = req.body?.order;
-    let offset = page * limit;
-    console.log(req.body);
-    let sqlQuery = `
-    SELECT
-        uuid,
-        username as userName,
-        felica_code as felicaCode,
-        isInitalLogin,
-        isAdmin,
-        register_date as registerDate
-    FROM
-        web_user_data
-    `;
-    if (order !== undefined && order !== false) {
-        sqlQuery += `
-        ORDER BY userName ${order}`;
-    }
-    sqlQuery += `
-        LIMIT ${offset}, ${limit}`;
-    let totalCountQuery = `SELECT COUNT(1) as count FROM game_event`;
-    const result = await query(sqlQuery);
-    const totalCountresult = await query(totalCountQuery);
-    const count = totalCountresult[0].count.toString();
-    res.json({
-        success: true,
-        data: result,
-        totalRecords: count,
-    });
-});
-
 adminApi.post("/updateWebUser", authenticateToken, async (req, res) => {
     let sqlQuery = `
     UPDATE
@@ -219,6 +184,207 @@ adminApi.post("/getGameMission", authenticateToken, async (req, res) => {
         data: result,
         totalRecords: count,
     });
+});
+
+adminApi.post("/getGameCharacter", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT
+        id,
+        name,
+        cv
+    FROM
+        game_character
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY name ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM game_character`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
+});
+
+adminApi.post("/updateGameCharacter", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    UPDATE
+        game_character 
+    SET 
+        name = '${req.body.name}',
+        cv = '${req.body.cv}'
+    WHERE 
+        id = ${req.body.id}
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/createGameCharacter", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    INSERT INTO
+        game_character
+    SET
+        name = '${req.body.name}',
+        cv = '${req.body.cv}'
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/deleteGameCharacter", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    DELETE FROM
+        game_character
+    WHERE
+        id = ${req.body.id}
+        `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, deleteId: result.insertId.toString() });
+});
+
+adminApi.post("/getGameReward", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT
+        item_id as id,
+        item_desc as itemDesc
+    FROM
+        game_reward
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY item_id ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM game_reward`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
+});
+
+adminApi.post("/updateGameReward", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    UPDATE
+        game_reward
+    SET 
+        item_desc = '${req.body.desc}'
+    WHERE 
+        item_id = ${req.body.id}
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/createGameReward", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    INSERT INTO
+        game_reward
+    SET
+        item_desc = '${req.body.desc}'
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/deleteGameReward", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    DELETE FROM
+        game_reward
+    WHERE
+        item_id = ${req.body.id}
+        `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, deleteId: result.insertId.toString() });
+});
+
+adminApi.post("/getGameCardSkill", authenticateToken, async (req, res) => {
+    let page = req.body?.page - 1;
+    let limit = req.body?.pageSize;
+    let order = req.body?.order;
+    let offset = page * limit;
+    console.log(req.body);
+    let sqlQuery = `
+    SELECT
+        skill_id as id,
+        skill_category as skillCategory,
+        skill_desc as skillDesc
+    FROM
+        game_card_skill
+    `;
+    if (order !== undefined && order !== false) {
+        sqlQuery += `
+        ORDER BY id ${order}`;
+    }
+    sqlQuery += `
+        LIMIT ${offset}, ${limit}`;
+    let totalCountQuery = `SELECT COUNT(1) as count FROM game_card_skill`;
+    const result = await query(sqlQuery);
+    const totalCountresult = await query(totalCountQuery);
+    const count = totalCountresult[0].count.toString();
+    res.json({
+        success: true,
+        data: result,
+        totalRecords: count,
+    });
+});
+
+adminApi.post("/updateGameCardSkill", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    UPDATE
+        game_card_skill
+    SET 
+        skill_category = '${req.body.category}',
+        skill_desc = '${req.body.desc}'
+    WHERE 
+        skill_id = ${req.body.id}
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/createGameCardSkill", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    INSERT INTO
+        game_card_skill
+    SET
+        skill_category = '${req.body.category}',
+        skill_desc = '${req.body.desc}'
+    `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, insertId: result.insertId.toString() });
+});
+
+adminApi.post("/deleteGameCardSkill", authenticateToken, async (req, res) => {
+    let sqlQuery = `
+    DELETE FROM
+        game_card_skill
+    WHERE
+        skill_id = ${req.body.id}
+        `;
+    let result = await query(sqlQuery);
+    res.send({ success: true, deleteId: result.insertId.toString() });
 });
 
 module.exports = adminApi;

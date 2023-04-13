@@ -18,7 +18,7 @@
 import { h, ref, defineComponent, render } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { NIcon, NLayout, NLayoutSider, NSpace, NMenu } from "naive-ui";
-import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon, IdCardOutline, PersonOutline, CardOutline, MusicalNotesOutline, ReceiptOutline } from "@vicons/ionicons5";
+import { LogOutOutline as LogOutIcon, HomeOutline as HomeIcon, GameControllerOutline as PlayDataIcon, CalendarOutline as EventIcon, OptionsOutline as OptionsIcon, LibraryOutline as CollectionIcon, IdCardOutline, PersonOutline, CardOutline, MusicalNotesOutline, ReceiptOutline, BulbOutline, GiftOutline, PeopleOutline } from "@vicons/ionicons5";
 import axios from "axios";
 axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
@@ -138,6 +138,33 @@ if (localStorage.getItem('isAdmin') == 1) {
         ),
         key: "gameMission",
         icon: renderIcon(ReceiptOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameCardSkill" },
+          { default: () => "Game Card Skill" }
+        ),
+        key: "gameCardSkill",
+        icon: renderIcon(BulbOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameCharacter" },
+          { default: () => "Game Character" }
+        ),
+        key: "gameCharacter",
+        icon: renderIcon(PeopleOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameReward" },
+          { default: () => "Game Reward" }
+        ),
+        key: "gameReward",
+        icon: renderIcon(GiftOutline)
       },
     ]
   })
