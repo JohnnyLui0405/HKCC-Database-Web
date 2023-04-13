@@ -263,16 +263,31 @@ userApi.post("/getUserGameDeck", authenticateToken, async (req, res) => {
     res.json({ success: true, data: result });
 });
 
-userApi.post("/getMusicPlayedCount", authenticateToken, async (req, res) => {
+userApi.post("/getMusicPlaysCount", authenticateToken, async (req, res) => {
     let extID = req.felicaCardID;
     let sqlQuery = `
     SELECT
-        GROUP_CONCAT(music_name) as labels,
-        GROUP_CONCAT(played_time_all_users) as data
+        GROUP_CONCAT(music_name ORDER BY played_time_all_users DESC) as labels,
+        GROUP_CONCAT(played_time_all_users ORDER BY played_time_all_users DESC) as data
     FROM
         music_played_times_all_users mptau`;
     const result = await query(sqlQuery);
-    console.log(result[0]);
+    const data = {
+        labels: result[0].labels.split(","),
+        data: JSON.parse(`[${result[0].data}]`),
+    };
+    res.json({ success: true, data: data });
+});
+
+userApi.post("/getPlayerRank", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+    let sqlQuery = `
+    SELECT 
+        GROUP_CONCAT(player_rating ORDER BY player_rating DESC) as data,
+        GROUP_CONCAT(user_name ORDER BY player_rating DESC) as labels
+    FROM
+        player_rating_desc vupr`;
+    const result = await query(sqlQuery);
     const data = {
         labels: result[0].labels.split(","),
         data: JSON.parse(`[${result[0].data}]`),

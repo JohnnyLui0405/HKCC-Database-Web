@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <n-space vertical>
-      <n-button @Click="showModalCreate = true">Create New Reward</n-button>
+      <n-button @Click="showModalCreate = true">Create New Skill</n-button>
       <n-modal v-model:show="showModalCreate">
-        <n-card style="width: 600px" title="Create New Reward" :bordered="false" size="huge" role="dialog"
+        <n-card style="width: 600px" title="Create New Skill" :bordered="false" size="huge" role="dialog"
           aria-modal="true">
           <template #header-extra>
           </template>
@@ -11,8 +11,11 @@
             require-mark-placement="right-hanging" :size="size" :style="{
               maxWidth: '640px'
             }">
-            <n-form-item-row path="desc" label="Reward Description">
-              <n-input v-model:value="modelCreate.desc" placeholder="Enter Reward Description" />
+            <n-form-item label="Category" path="category">
+              <n-select v-model:value="modelCreate.category" :options="categoryOptions"></n-select>
+            </n-form-item>
+            <n-form-item-row path="desc" label="Skill Description">
+              <n-input v-model:value="modelCreate.desc" placeholder="Enter SkillDescription" />
             </n-form-item-row>
           </n-form>
           <template #footer>
@@ -24,13 +27,16 @@
         :row-key="rowKey" @update:sorter="handleSorterChange" @update:filters="handleFiltersChange"
         @update:page="handlePageChange" />
       <n-modal v-model:show="showModal">
-        <n-card id="options" title="Reward Manage" style="max-width: 300px;">
+        <n-card id="options" title="Skill Manage" style="max-width: 600px;">
           <n-scrollbar style="max-height: 500px;">
             <n-form v-if="!loading" ref="formRef" :model="model" label-placement="top"
               require-mark-placement="right-hanging" :size="size" :style="{
                 maxWidth: '640px'
               }">
-              <n-form-item label="Reward Description" path="userName">
+              <n-form-item label="Category" path="userName">
+                <n-select v-model:value="model.category" :options="categoryOptions"></n-select>
+              </n-form-item>
+              <n-form-item label="Skill Description" path="userName">
                 <n-input v-model:value="model.desc"></n-input>
               </n-form-item>
             </n-form>
@@ -74,7 +80,7 @@ const category = {
 }
 
 const desc = {
-  title: 'Reward Description',
+  title: 'Skill Description',
   key: 'skillDesc'
 }
 const createColumns = ({
@@ -102,6 +108,8 @@ const createColumns = ({
     }
   ];
 };
+
+
 
 async function query(page, pageSize = 5, order = 'ascend', filterValues = []) {
   // return new Promise((resolve) => {
@@ -145,6 +153,36 @@ export default defineComponent({
     const model = ref({
 
     })
+    const categoryOptions = [
+      {
+        label: 'Attack',
+        value: 'Attack'
+      },
+      {
+        label: 'Guard',
+        value: 'Guard'
+      },
+      {
+        label: 'Support',
+        value: 'Support'
+      },
+      {
+        label: 'Boost',
+        value: 'Boost'
+      },
+      {
+        label: 'DangerAttack',
+        value: 'DangerAttack'
+      },
+      {
+        label: 'DangerGuard',
+        value: 'DangerGuard'
+      },
+      {
+        label: 'DangerBoost',
+        value: 'DangerBoost'
+      },
+    ]
     const modelCreate = ref({
       desc: ref(null)
     })
@@ -159,7 +197,8 @@ export default defineComponent({
       edit(row) {
         console.log(row)
         showModal.value = true
-        model.value.desc = row.itemDesc
+        model.value.desc = row.skillDesc
+        model.value.category = row.skillCategory
         model.value.id = row.id
       }
     },
@@ -200,6 +239,7 @@ export default defineComponent({
         data: {
           id: model.value.id,
           desc: model.value.desc,
+          category: model.value.category
         }
       })
       if (res.data.success) {
@@ -265,6 +305,7 @@ export default defineComponent({
             url: "/api/admin/createGameCardSkill",
             data: {
               desc: modelCreate.value.desc,
+              category: modelCreate.value.category,
             },
           });
           if (res.data.success) {
@@ -291,19 +332,20 @@ export default defineComponent({
       desc: [
         {
           required: true,
-          message: "Please input Reward Description",
+          message: "Please input Skill Description",
           trigger: "blur",
         },
       ],
-      cv: [
+      category: [
         {
           required: true,
           message: "Please input cv",
-          trigger: "blur",
+          trigger: ["change", "blur"],
         },
       ],
     });
     return {
+      categoryOptions,
       formRef: ref(null),
       formCreateRef,
       rulesCreate,

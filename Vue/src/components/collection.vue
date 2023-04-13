@@ -1,9 +1,10 @@
 <template>
   <div class="container">
-    <n-grid x-gap="12" y-gap="6" :cols="3">
+    <n-grid x-gap="0" y-gap="20" :cols="3">
       <template v-if="!loading" v-for="(item, index) in data">
-        deckID: {{ item.deckID }}<br>
+
         <n-gi v-for="(card, index2) in item.children">
+          <n-h4 v-if="index2 == 1" style="text-align: center;">Deck: {{ index + 1 }}</n-h4>
           <n-card height="600 px">
             Card Name: {{ card.cardName }}<br>
             Attribute: {{ card.attribute }}<br>

@@ -11,6 +11,7 @@
         <router-view></router-view>
       </n-layout>
     </n-layout>
+
   </n-space>
 </template>
 
@@ -25,19 +26,6 @@ axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getIte
 const router = useRouter();
 
 const renderIcon = (icon) => () => h(NIcon, null, { default: () => h(icon) });
-
-
-const res = axios({
-  method: "get",
-  url: "/api/user/profile"
-}).catch(err => {
-  console.log(err.response.status)
-  if (err.response.status == 403) {
-    localStorage.removeItem('token')
-    router.push('/signin')
-  }
-
-})
 
 let menuOptions = [
   {
@@ -115,33 +103,6 @@ if (localStorage.getItem('isAdmin') == 1) {
       {
         label: () => h(
           RouterLink,
-          { to: "/admin/gameCard" },
-          { default: () => "Game Card" }
-        ),
-        key: "gameCard",
-        icon: renderIcon(CardOutline)
-      },
-      {
-        label: () => h(
-          RouterLink,
-          { to: "/admin/gameMusic" },
-          { default: () => "Game Music" }
-        ),
-        key: "gameMusic",
-        icon: renderIcon(MusicalNotesOutline)
-      },
-      {
-        label: () => h(
-          RouterLink,
-          { to: "/admin/gameMission" },
-          { default: () => "Game Mission" }
-        ),
-        key: "gameMission",
-        icon: renderIcon(ReceiptOutline)
-      },
-      {
-        label: () => h(
-          RouterLink,
           { to: "/admin/gameCardSkill" },
           { default: () => "Game Card Skill" }
         ),
@@ -165,6 +126,33 @@ if (localStorage.getItem('isAdmin') == 1) {
         ),
         key: "gameReward",
         icon: renderIcon(GiftOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameCard" },
+          { default: () => "Game Card(Old)" }
+        ),
+        key: "gameCard",
+        icon: renderIcon(CardOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameMusic" },
+          { default: () => "Game Music(Old)" }
+        ),
+        key: "gameMusic",
+        icon: renderIcon(MusicalNotesOutline)
+      },
+      {
+        label: () => h(
+          RouterLink,
+          { to: "/admin/gameMission" },
+          { default: () => "Game Mission(Old)" }
+        ),
+        key: "gameMission",
+        icon: renderIcon(ReceiptOutline)
       },
     ]
   })
