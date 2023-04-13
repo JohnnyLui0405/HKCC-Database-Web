@@ -1,13 +1,12 @@
 <template>
     <div class="container">
-        <Pie v-if="loaded" :data="chartData" />
+        <Pie :data="chartData" />
     </div>
 </template>
   
 <script>
 import { Bar, Pie } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement } from 'chart.js'
-import { defineProps } from 'vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 

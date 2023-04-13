@@ -1,10 +1,10 @@
 <template>
-  <PieChart :chartData="{
-    labels: ['test', '回レ！雪月花'],
+  <PieChart v-if="!loading" :chartData="{
+    labels: data.labels,
     datasets: [
       {
         backgroundColor: '#f87979',
-        data: [19, 1]
+        data: data.data
       }
     ]
   }" />
@@ -13,8 +13,26 @@
 <script setup>
 import PieChart from "../charts/PieChart.vue";
 import { NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter, NLayoutSider, NSpace } from "naive-ui";
-
-
+import { onMounted, ref } from "vue";
+import axios from "axios";
+axios.defaults.baseURL = "https://dbprojectapi.courtcloud.me";
+axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+const data = ref(null);
+const loading = ref(true);
+onMounted(async () => {
+  const res = await axios({
+    method: "post",
+    url: "/api/user/getMusicPlayedCount"
+  }).catch(err => {
+    console.log(err.response.status)
+    if (err.response.status == 403) {
+      localStorage.removeItem('token')
+      router.push('/signin')
+    }
+  })
+  data.value = res.data
+  loading.value = false;
+})
 </script>
 
 <style scoped>
