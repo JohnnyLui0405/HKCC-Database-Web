@@ -263,4 +263,21 @@ userApi.post("/getUserGameDeck", authenticateToken, async (req, res) => {
     res.json({ success: true, data: result });
 });
 
+userApi.post("/getMusicPlayedCount", authenticateToken, async (req, res) => {
+    let extID = req.felicaCardID;
+    let sqlQuery = `
+    SELECT
+        GROUP_CONCAT(music_name) as labels,
+        GROUP_CONCAT(played_time_all_users) as data
+    FROM
+        music_played_times_all_users mptau`;
+    const result = await query(sqlQuery);
+    console.log(result[0]);
+    const data = {
+        labels: result[0].labels.split(","),
+        data: JSON.parse(`[${result[0].data}]`),
+    };
+    res.json({ success: true, data: data });
+});
+
 module.exports = userApi;
