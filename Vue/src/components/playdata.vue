@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <n-grid x-gap="12" y-gap="0" :cols="3">
+    <n-grid x-gap="12" y-gap="0" cols="1 s:2 m:2 l:3 xl:3 2xl:3" responsive="screen">
       <!-- <n-gi>
         <n-card style="height:600px">
           <PieChart v-if="!loading" :chartData="{

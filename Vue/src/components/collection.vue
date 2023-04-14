@@ -1,34 +1,48 @@
 <template>
-  <div class="container">
-    <n-grid x-gap="0" y-gap="20" :cols="3">
-      <template v-if="!loading" v-for="(item, index) in data">
+  <n-spin :show="loading">
+    <div class="container">
+      <n-grid v-if="!loading && data.length != 0" x-gap="0" y-gap="20" cols="1 s:3 m:3 l:3 xl:3 2xl:3"
+        responsive="screen">
+        <template v-for="(item, index) in data">
+          <n-gi v-for="(card, index2) in item.children">
+            <n-h4 v-if="index2 == 1" style="text-align: center;">Deck: {{ index + 1 }}</n-h4>
+            <n-card height="600 px">
+              Card Name: {{ card.cardName }}<br>
+              Attribute: {{ card.attribute }}<br>
+              School: {{ card.school }}<br>
+              Section: {{ card.section }}<br>
+              Rarity: {{ card.rarity }}
+            </n-card>
+          </n-gi>
 
-        <n-gi v-for="(card, index2) in item.children">
-          <n-h4 v-if="index2 == 1" style="text-align: center;">Deck: {{ index + 1 }}</n-h4>
-          <n-card height="600 px">
-            Card Name: {{ card.cardName }}<br>
-            Attribute: {{ card.attribute }}<br>
-            School: {{ card.school }}<br>
-            Section: {{ card.section }}<br>
-            Rarity: {{ card.rarity }}
-          </n-card>
-        </n-gi>
-      </template>
-    </n-grid>
-  </div>
+        </template>
+      </n-grid>
+      <n-empty v-else size="huge" description="No Game Deck Found">
+        <template #extra>
+        </template>
+      </n-empty>
+    </div>
+  </n-spin>
 </template>
 
 <script setup>
 import { parseStringStyle } from "@vue/shared";
 import axios from "axios";
-import { NGrid, NGridItem, NCard, NSkeleton, NStatistic, NNumberAnimation, NTime } from "naive-ui";
+import { NGrid, NGridItem, NCard, NSkeleton, NStatistic, NNumberAnimation, NTime, breakpoints } from "naive-ui";
 import { onMounted, ref } from "vue";
 axios.defaults.baseURL = 'https://dbprojectapi.courtcloud.me';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 const loading = ref(true);
 let userData = null;
 let data = null;
-
+const isMobile = () => {
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    return true
+  } else {
+    return false
+  }
+}
+console.log(isMobile())
 axios({
   method: "post",
   url: "/api/user/getUserGameDeck"

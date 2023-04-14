@@ -19,7 +19,8 @@ function authenticateToken(req, res, next) {
         console.log(err);
 
         if (err) return res.sendStatus(403);
-        req.felicaCardID = result.felicaCardID;
+        req.felicaCardID = result?.felicaCardID;
+        req.webUserID = result?.webUserID;
 
         next();
     });
@@ -47,7 +48,7 @@ userApi.post("/login", async (req, res) => {
             .digest("hex");
         sqlQuery = `
 SELECT
-    wud.id as userUUID,
+    wud.id as userID,
     wud.username as userName,
     wud.isAdmin as isAdmin,
     efc.ext_id as extID
@@ -63,7 +64,11 @@ WHERE
     if (result.length !== 0) {
         console.log(result[0]);
         const token = jwt.sign(
-            { felicaCardID: result[0].extID, isAdmin: result[0].isAdmin },
+            {
+                felicaCardID: result[0].extID,
+                isAdmin: result[0].isAdmin,
+                webUserID: result[0].userID,
+            },
             process.env.TOKEN_SECRET,
             {
                 expiresIn: "1d",

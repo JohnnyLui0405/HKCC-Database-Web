@@ -339,7 +339,7 @@ export default defineComponent({
       category: [
         {
           required: true,
-          message: "Please input cv",
+          message: "Please input Category",
           trigger: ["change", "blur"],
         },
       ],
