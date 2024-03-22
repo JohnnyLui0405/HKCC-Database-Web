@@ -1,3 +1,2 @@
-This is the frontend & backend source code of my HKCC Database SEHH2240<br>
-VueJS & express.js are used in the project<br>
-The grading of this project is A- .w.
+# Full Stack Game Management System (SEHH2240 Database Project)
+This is a game management/profile system for reviewing game stats, game inventory, user management using Vue.js & Express.js
